@@ -32,7 +32,7 @@ Install the OpenAI Python client library and Azure Identity library with:
 ```console
 python3 -m venv .venv
 source .venv/bin/activate.fish
-pip3 install openai azure.identity
+pip3 install openai azure.identity flask
 ```
 
 ---
@@ -60,6 +60,7 @@ You need to set the `model` variable to the deployment name you chose when you d
 ```python
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from openai import AzureOpenAI
+from flask import Flask
 import os
 
 token_provider = get_bearer_token_provider(
@@ -76,7 +77,7 @@ client = AzureOpenAI(
 )
 
 response = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-4o-2",
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "Does Azure OpenAI support customer managed keys?"},
@@ -84,6 +85,12 @@ response = client.chat.completions.create(
         {"role": "user", "content": "Do other Azure AI services support this too?"}
     ]
 )
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello_world():
+    return response.choices[0].message.content
 
 print(response.choices[0].message.content)
 ```
