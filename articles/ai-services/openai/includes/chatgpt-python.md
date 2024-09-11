@@ -25,20 +25,14 @@ ms.date: 11/15/2023
 
 ## Set up
 
-Install the OpenAI Python client library with:
+Install the OpenAI Python client library and Azure Identity library with:
 
 # [OpenAI Python 1.x](#tab/python-new)
 
 ```console
-pip install openai
-```
-
-# [OpenAI Python 0.28.1](#tab/python)
-
-[!INCLUDE [Deprecation](../includes/deprecation.md)]
-
-```console
-pip install openai==0.28.1
+python3 -m venv .venv
+source .venv/bin/activate.fish
+python3 -m pip install xyz
 ```
 
 ---
@@ -55,26 +49,34 @@ pip install openai==0.28.1
 
 ## Create a new Python application
 
-1. Create a new Python file called quickstart.py. Then open it up in your preferred editor or IDE.
+1. Create a new Python file called app.py. Then open it up in your preferred editor or IDE.
 
-2. Replace the contents of quickstart.py with the following code.
+2. Replace the contents of app.py with the following code.
 
 # [OpenAI Python 1.x](#tab/python-new)
 
 You need to set the `model` variable to the deployment name you chose when you deployed the GPT-3.5-Turbo or GPT-4 models. Entering the model name will result in an error unless you chose a deployment name that is identical to the underlying model name.
 
 ```python
-import os
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from openai import AzureOpenAI
+import os
+
+token_provider = get_bearer_token_provider(
+    DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
+)
+
+api_version = "2024-07-01-preview"
+endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
 
 client = AzureOpenAI(
-  azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
-  api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
-  api_version="2024-02-01"
+    api_version=api_version,
+    azure_endpoint=endpoint,
+    azure_ad_token_provider=token_provider,
 )
 
 response = client.chat.completions.create(
-    model="gpt-35-turbo", # model = "deployment_name".
+    model="gpt-4o",
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "Does Azure OpenAI support customer managed keys?"},
