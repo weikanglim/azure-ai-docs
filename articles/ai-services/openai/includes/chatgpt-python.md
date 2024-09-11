@@ -32,7 +32,7 @@ Install the OpenAI Python client library and Azure Identity library with:
 ```console
 python3 -m venv .venv
 source .venv/bin/activate.fish
-python3 -m pip install xyz
+pip3 install openai azure.identity
 ```
 
 ---
